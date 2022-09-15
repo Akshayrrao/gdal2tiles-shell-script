@@ -21,47 +21,53 @@ echo "Script Started..."
 while :; do
     case $1 in
     -file)
-        if [ "$1" ]; then
+        if [ "$1" ] && [ "$2" ]; then
             fileName=$2
             shift
         else
             echo 'ERROR: "--file" requires a non-empty option argument.'
+            exit 0;
         fi
         ;;
     -ulx)
-        if [ "$1" ]; then
+        if [ "$1" ] && [ "$2" ]; then
             ulx=$2
             shift
         else
-            echo 'ERROR: "--file" requires a non-empty option argument.'
+            echo 'ERROR: "--ulx" requires a non-empty option argument.'
+            exit 0;
         fi
         ;;  
     -uly)
-        if [ "$1" ]; then
+        if [ "$1" ] && [ "$2" ]; then
             uly=$2
             shift
         else
-            echo 'ERROR: "--file" requires a non-empty option argument.'
+            echo 'ERROR: "--uly" requires a non-empty option argument.'
+            exit 0;
         fi
         ;; 
     -llx)
-        if [ "$1" ]; then
+        if [ "$1" ] && [ "$2" ]; then
             llx=$2
             shift
         else
-            echo 'ERROR: "--file" requires a non-empty option argument.'
+            echo 'ERROR: "--llx" requires a non-empty option argument.'
+            exit 0;
         fi
         ;; 
     -lly)
-        if [ "$1" ]; then
+        if [ "$1" ] && [ "$2" ]; then
             lly=$2
             shift
         else
-            echo 'ERROR: "--file" requires a non-empty option argument.'
+            echo 'ERROR: "--lly" requires a non-empty option argument.'
+            exit 0;
         fi
         ;;                              
     -?*)
-        printf 'WARN: Unknown option (ignored): %s\n' 
+        printf 'WARN: Unknown option\n'
+        exit 0; 
         ;;
     *)
         break
@@ -81,7 +87,7 @@ then
 else
     gdal_translate -of vrt -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName output.vrt
     gdal2tiles.py output.vrt $dir 
-    rm output.vrt   
+    rm output.vrt  
 fi
 echo "done"
 ```
