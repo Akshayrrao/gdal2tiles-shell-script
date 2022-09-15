@@ -75,6 +75,10 @@ while :; do
     esac
     shift
 done
+if [ ! -f "$fileName" ]; then
+    echo "$FILE not Found."
+    exit 0;    
+fi
 data=`gdalinfo -json $fileName`
 key='colorTable'
 dir=$(echo "$fileName" | cut -f 1 -d '.')       		
@@ -84,10 +88,12 @@ then
     gdal_translate -of vrt -expand rgba temp.vrt output.vrt
     gdal2tiles.py output.vrt $dir
     rm temp.vrt output.vrt
+#    mv $fileName $dir
 else
     gdal_translate -of vrt -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName output.vrt
     gdal2tiles.py output.vrt $dir 
-    rm output.vrt  
+    rm output.vrt
+#    mv $fileName $dir   
 fi
 echo "done"
 ```
