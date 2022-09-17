@@ -102,4 +102,4 @@ echo "done"
 ```
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](https://github.com/Akshayrrao/gdal2tiles-shell-script/blob/main/LICENSE)
