@@ -37,7 +37,7 @@ while :; do
             echo 'ERROR: "--ulx" requires a non-empty option argument.'
             exit 0;
         fi
-        ;;  
+        ;;
     -uly)
         if [ "$1" ] && [ "$2" ]; then
             uly=$2
@@ -46,7 +46,7 @@ while :; do
             echo 'ERROR: "--uly" requires a non-empty option argument.'
             exit 0;
         fi
-        ;; 
+        ;;
     -llx)
         if [ "$1" ] && [ "$2" ]; then
             llx=$2
@@ -55,7 +55,7 @@ while :; do
             echo 'ERROR: "--llx" requires a non-empty option argument.'
             exit 0;
         fi
-        ;; 
+        ;;
     -lly)
         if [ "$1" ] && [ "$2" ]; then
             lly=$2
@@ -64,10 +64,10 @@ while :; do
             echo 'ERROR: "--lly" requires a non-empty option argument.'
             exit 0;
         fi
-        ;;                              
+        ;;
     -?*)
         printf 'WARN: Unknown option\n'
-        exit 0; 
+        exit 0;
         ;;
     *)
         break
@@ -77,21 +77,27 @@ while :; do
 done
 if [ ! -f "$fileName" ]; then
     echo "$fileName not Found."
-    exit 0;    
+    exit 0;
 fi
 data=`gdalinfo -json $fileName`
 key='colorTable'
-dir=$(echo "$fileName" | cut -f 1 -d '.')       		
-if [[ "$data" == *"$key"* ]]; 
-then
-    gdal_translate -of vrt -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName temp.vrt
-    gdal_translate -of vrt -expand rgba temp.vrt output.vrt
-    gdal2tiles.py output.vrt $dir
-    rm temp.vrt output.vrt
+dir=$(echo "$fileName" | cut -f 1 -d '.')
+if [[ "$data" == *"$key"* ]]; then
+    gdal_translate -of GTiff -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName temp.tif
+    gdal_translate -of GTiff -expand rgba temp.tif output.tif
+
+    if [ -d "$dir" ] && [ "$(ls -A $dir)" ]; then
+        rm -r $dir/*
+    fi
+    gdal2tiles.py --processes=2  output.tif $dir
+    rm temp.tif output.tif 
 else
-    gdal_translate -of vrt -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName output.vrt
-    gdal2tiles.py output.vrt $dir 
-    rm output.vrt
+    gdal_translate -of GTiff -a_srs EPSG:4326 -a_ullr $ulx $uly $llx $lly $fileName output.tif
+    if [ -d "$dir" ] && [  "$(ls -A $dir)" ]; then
+         rm -r $dir/*
+    fi
+    gdal2tiles.py --processes=2  output.tif $dir
+    rm output.tif 
 fi
 echo "done"
 ```
